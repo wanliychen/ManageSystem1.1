@@ -1,0 +1,84 @@
+package org.example;
+
+import java.util.*;
+import java.io.*;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class CustomerRegister {
+    // 文件路径
+    private static final String CUSTOMER_FILE = "customers.txt";
+    CustomerDatabase customerDatabase=new CustomerDatabase();
+
+    private Scanner scanner = new Scanner(System.in);
+
+    // 使用MD5加密
+    private static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+    }
+
+    public void run() {
+        System.out.println("请输入用户名：");
+        String username = scanner.nextLine();
+        System.out.println("请输入密码：");
+        String rawpassword = scanner.nextLine();
+        System.out.println("请输入邮箱：");
+        String email = scanner.nextLine();
+        System.out.println("请输入电话号码：");
+        String phone = scanner.nextLine();
+        System.out.println("请输入注册日期（格式：yyyy-MM-dd）：");
+        String registrationDate = scanner.nextLine(); // 修改为String类型
+        System.out.println("请输入用户等级：");
+        String userLevel = scanner.nextLine();
+
+        if (isValidUsername(username) && isValidPassword(rawpassword) && isValidEmail(email)) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(CUSTOMER_FILE, true))) {
+                String hashedPassword = hashPassword(rawpassword);
+                // writer.write(username + ";" + hashedPassword + ";" + email + ";" + phone + ";" + registrationDate + ";" + userLevel);
+                // writer.newLine();
+                Customer customer = new Customer(username, hashedPassword, email, phone, registrationDate, userLevel);
+                customerDatabase.addCustomer(customer);
+                
+                System.out.println("注册成功！");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("用户名、密码或邮箱不符合要求，注册失败！");
+        }
+    }
+
+    private boolean isValidUsername(String username) {
+        return username.length() >= 5;
+    }
+
+    private boolean isValidPassword(String password) {
+        if (password.length() < 8) {
+            return false;
+        }
+        boolean hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpper = true;
+            else if (Character.isLowerCase(c)) hasLower = true;
+            else if (Character.isDigit(c)) hasDigit = true;
+            else hasSpecial = true;
+        }
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+
+    private boolean isValidEmail(String email) {
+        // 简单的邮箱格式验证
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+}
