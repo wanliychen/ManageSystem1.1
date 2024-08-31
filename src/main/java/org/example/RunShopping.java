@@ -28,7 +28,7 @@ public class RunShopping {
                     shoppingCart.updateCartItemQuantity();
                     break;
                 case 4:
-                    shoppingCart.getShoppingCartHistory();
+                    shoppingCart.getPurchaseHistory();
                     break;
                 case 5:
                     shoppingCart.checkout();
@@ -51,5 +51,4 @@ public class RunShopping {
         System.out.println("5. 结账");
         System.out.println("6. 退出");
     }
-    
 }

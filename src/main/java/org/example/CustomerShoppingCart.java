@@ -1,132 +1,160 @@
 package org.example;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class CustomerShoppingCart {
-    private Map<String, Integer> shoppingCart; // 商品集
+    private Map<String, Integer> shoppingCart; // 商品ID和数量的映射
     private ProductDatabase productDatabase;
-    private static final String FILE_NAME = "shoppingCart.txt"; // 文件名
-
-    Scanner scanner = new Scanner(System.in);
+    private List<Map<String, Integer>> purchaseHistoryList; // 保存购物历史
+    private Scanner scanner = new Scanner(System.in);
 
     public CustomerShoppingCart(Customer customer) {
         this.shoppingCart = new HashMap<>();
         this.productDatabase = new ProductDatabase();
-        loadCartFromFile(); // 从文件中加载购物车内容
+        this.purchaseHistoryList = new ArrayList<>(); 
     }
 
-    // 将购物车内容保存到文件
-    private void saveCartToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(shoppingCart);
-        } catch (IOException e) {
-            System.out.println("Error saving cart to file: " + e.getMessage());
-        }
-    }
-
-    // 从文件加载购物车内容
-    private void loadCartFromFile() {
-        File file = new File(FILE_NAME);
-        if (file.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-                shoppingCart = (Map<String, Integer>) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Error loading cart from file: " + e.getMessage());
-            }
-        }
-    }
-
-    // 加入购物车
+    // 将商品加入购物车
     public void addToCart() {
         System.out.println("请输入商品ID：");
         String productId = scanner.nextLine();
         System.out.println("请输入数量：");
-        int quantity = scanner.nextInt();
-        scanner.nextLine(); // 消耗换行
+        int quantity;
+        try {
+            quantity = scanner.nextInt();
+            scanner.nextLine(); // 消耗换行符
+        } catch (InputMismatchException e) {
+            System.out.println("输入的数量无效，请输入一个整数。");
+            scanner.nextLine(); // 清空输入流
+            return;
+        }
+
         if (productDatabase.findProductById(Integer.parseInt(productId)) != null) {
             shoppingCart.put(productId, shoppingCart.getOrDefault(productId, 0) + quantity);
-            productDatabase.updateProductQuantity(Integer.parseInt(productId), quantity);
-            saveCartToFile(); // 保存购物车内容
+            System.out.println("商品成功加入购物车！");
         } else {
-            System.out.println("Product ID " + productId + " not found in the database.");
+            System.out.println("未找到商品ID " + productId + " 对应的商品。");
         }
     }
 
-    // 从购物车删除
+    // 将商品从购物车中移除
     public void removeFromCart() {
-        System.out.println("请输入商品ID：");
+        System.out.println("请输入要移除的商品ID：");
         String productId = scanner.nextLine();
-        System.out.println("请输入数量：");
-        int quantity = scanner.nextInt();
-        scanner.nextLine(); // 消耗换行
-        if (shoppingCart.containsKey(productId)) {
-            int currentQuantity = shoppingCart.get(productId);
-            if (currentQuantity > quantity) {
-                shoppingCart.put(productId, currentQuantity - quantity);
-            } else {
-                shoppingCart.remove(productId);
-            }
-            productDatabase.increaseProductQuantity(Integer.parseInt(productId), quantity);
-            saveCartToFile(); // 保存购物车内容
+        
+        if (!shoppingCart.containsKey(productId)) {
+            System.out.println("购物车中未找到商品ID " + productId);
+            return;
+        }
+
+        System.out.println("确认要移除商品ID " + productId + " 吗？(yes/no)");
+        String confirmation = scanner.nextLine();
+        
+        if (confirmation.equalsIgnoreCase("yes")) {
+            shoppingCart.remove(productId);
+            System.out.println("商品已从购物车中移除。");
         } else {
-            System.out.println("Product ID " + productId + " not found in the cart.");
+            System.out.println("取消移除操作。");
         }
     }
 
-    // 更新购物车商品数量
+    // 修改购物车中的商品数量
     public void updateCartItemQuantity() {
         System.out.println("请输入商品ID：");
         String productId = scanner.nextLine();
-        System.out.println("请输入数量：");
-        int newQuantity = scanner.nextInt();
-        scanner.nextLine();//消耗换行
-        if (shoppingCart.containsKey(productId)) {
-            int currentQuantity = shoppingCart.get(productId);
-            int quantityChange = newQuantity - currentQuantity;
-            shoppingCart.put(productId, newQuantity);
-            productDatabase.updateProductQuantity(Integer.parseInt(productId), quantityChange);
-            saveCartToFile(); // 保存购物车内容
+        if (!shoppingCart.containsKey(productId)) {
+            System.out.println("购物车中未找到商品ID " + productId);
+            return;
+        }
+
+        System.out.println("请输入新的数量：");
+        int newQuantity;
+        try {
+            newQuantity = scanner.nextInt();
+            scanner.nextLine(); // 消耗换行符
+        } catch (InputMismatchException e) {
+            System.out.println("输入的数量无效，请输入一个整数。");
+            scanner.nextLine(); // 清空输入流
+            return;
+        }
+
+        if (newQuantity <= 0) {
+            shoppingCart.remove(productId);
+            System.out.println("商品已从购物车中移除。");
         } else {
-            System.out.println("Product ID " + productId + " not found in the cart.");
+            shoppingCart.put(productId, newQuantity);
+            System.out.println("商品数量已更新。");
         }
     }
 
-    // 获取购物车历史内容
-    public void getShoppingCartHistory() {
-        StringBuilder cart = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : shoppingCart.entrySet()) {
-            cart.append("Product ID: ").append(entry.getKey())
-                .append(", Quantity: ").append(entry.getValue())
-                .append("\n");
-        }
-        System.out.println(cart.toString());
-    }
-
-    // 结账
+    // 模拟结账
     public void checkout() {
+        if (shoppingCart.isEmpty()) {
+            System.out.println("购物车为空，无法结账。");
+            return;
+        }
+
         System.out.println("请选择支付方式：");
         System.out.println("1. 支付宝");
         System.out.println("2. 微信");
         System.out.println("3. 银行卡");
 
         int choice = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine(); // 消耗换行符
 
         switch (choice) {
             case 1:
-                System.out.println("使用支付宝支付");
+                System.out.println("使用支付宝支付...");
                 break;
             case 2:
-                System.out.println("使用微信支付");
+                System.out.println("使用微信支付...");
                 break;
             case 3:
-                System.out.println("使用银行卡支付");
+                System.out.println("使用银行卡支付...");
                 break;
             default:
-                System.out.println("无效的支付方式");
+                System.out.println("无效的支付方式。");
+                return;
+        }
+
+        // 模拟支付成功后更新商品库存
+        for (Map.Entry<String, Integer> entry : shoppingCart.entrySet()) {
+            int productId = Integer.parseInt(entry.getKey());
+            int quantity = entry.getValue();
+            productDatabase.updateProductQuantity(productId, quantity);
+        }
+
+        // 保存购买记录
+        purchaseHistoryList.add(new HashMap<>(shoppingCart));
+
+        // 清空购物车
+        shoppingCart.clear();
+        System.out.println("结账成功，购物车已清空！");
+    }
+
+    // 查看购物历史
+   public void getPurchaseHistory() {
+        if (purchaseHistoryList.isEmpty()) {
+            System.out.println("暂无购物历史。");
+            return;
+        }
+        System.out.println("您的购物历史：");
+        for (Map<String, Integer> history : purchaseHistoryList) {
+            // 获取当前北京时间
+            ZonedDateTime beijingTime = ZonedDateTime.now(ZoneId.of("Asia/Shanghai"));
+
+            // 使用包含日期和时间的 ZonedDateTime 对象
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = beijingTime.format(formatter);
+
+            System.out.println("购物时间: " + formattedDateTime);
+            System.out.println("商品清单: " + history);
         }
     }
 }
