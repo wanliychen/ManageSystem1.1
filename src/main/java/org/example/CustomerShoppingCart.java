@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -138,13 +137,14 @@ public class CustomerShoppingCart {
         System.out.println("结账成功，购物车已清空！");
     }
 
-    // 查看购物历史
-   public void getPurchaseHistory() {
+     // 查看购物历史
+     public void getPurchaseHistory() {
         if (purchaseHistoryList.isEmpty()) {
             System.out.println("暂无购物历史。");
             return;
         }
         System.out.println("您的购物历史：");
+
         for (Map<String, Integer> history : purchaseHistoryList) {
             // 获取当前北京时间
             ZonedDateTime beijingTime = ZonedDateTime.now(ZoneId.of("Asia/Shanghai"));
