@@ -125,6 +125,7 @@ public class CustomerShoppingCart {
         for (Map.Entry<String, Integer> entry : shoppingCart.entrySet()) {
             int productId = Integer.parseInt(entry.getKey());
             int requestedQuantity = entry.getValue();
+            
             // 从数据库获取当前库存
             Product product = productDatabase.findProductById(productId);
             if (product != null) {
