@@ -16,7 +16,7 @@ public class ProductDatabase {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Error saving products to file: " + e.getMessage());
+            System.err.println("保存商品到文件时出错: " + e.getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ public class ProductDatabase {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Error loading products from file: " + e.getMessage());
+                System.err.println("加载商品文件时出错: " + e.getMessage());
             }
         }
         return products;
@@ -54,22 +54,34 @@ public class ProductDatabase {
         List<Product> products = loadProductsFromFile();
         products.add(product);
         saveProductsToFile(products);
+        System.out.println("商品已成功添加: " + product.getProductName());
     }
 
     // 删除商品
     public static void deleteProduct(int productId) {
         List<Product> products = loadProductsFromFile();
-        products.removeIf(p -> p.getProductId() == productId);
+        boolean removed = products.removeIf(p -> p.getProductId() == productId);
         saveProductsToFile(products);
+        if (removed) {
+            System.out.println("商品已成功删除，商品ID: " + productId);
+        } else {
+            System.out.println("未找到对应商品，商品ID: " + productId);
+        }
     }
 
     // 查找商品（通过ID）
     public static Product findProductById(int productId) {
         List<Product> products = loadProductsFromFile();
-        return products.stream()
+        Product product = products.stream()
                 .filter(p -> p.getProductId() == productId)
                 .findFirst()
                 .orElse(null);
+        if (product != null) {
+            System.out.println("找到商品，商品ID: " + productId + "，商品名称: " + product.getProductName());
+        } else {
+            System.out.println("未找到对应商品，商品ID: " + productId);
+        }
+        return product;
     }
 
     // 更新商品
@@ -82,33 +94,31 @@ public class ProductDatabase {
             }
         }
         saveProductsToFile(products);
+        System.out.println("商品已成功更新，商品ID: " + productId);
     }
 
     // 获取所有商品
     public static List<Product> getAllProducts() {
+        System.out.println("正在加载所有商品...");
         return loadProductsFromFile();
     }
 
-    // 更新商品库存数量（减少）
+    // 更新商品库存数量
     public static void updateProductQuantity(int productId, int quantity) {
         Product product = findProductById(productId);
         if (product != null) {
             int newQuantity = product.getNums() - quantity;
-            if (newQuantity >= 0) {
+            if (newQuantity > 0) {
                 product.setNums(newQuantity);
                 updateProduct(productId, product);
-            } else {
-                System.err.println("Insufficient quantity for product ID " + productId);
+                System.out.println("商品库存已更新，商品ID: " + productId + "，剩余库存: " + newQuantity);
+            } else if (newQuantity <= 0) {
+                // 删除商品，如果数量小于或等于0
+                deleteProduct(productId);
+               
             }
-        }
-    }
-
-    // 增加商品库存数量
-    public static void increaseProductQuantity(int productId, int quantity) {
-        Product product = findProductById(productId);
-        if (product != null) {
-            product.setNums(product.getNums() + quantity);
-            updateProduct(productId, product);
+        } else {
+            System.out.println("未找到对应商品，商品ID: " + productId);
         }
     }
 }

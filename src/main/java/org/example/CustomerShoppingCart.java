@@ -122,11 +122,19 @@ public class CustomerShoppingCart {
                 return;
         }
 
-        // 模拟支付成功后更新商品库存
         for (Map.Entry<String, Integer> entry : shoppingCart.entrySet()) {
             int productId = Integer.parseInt(entry.getKey());
-            int quantity = entry.getValue();
-            productDatabase.updateProductQuantity(productId, quantity);
+            int requestedQuantity = entry.getValue();
+            // 从数据库获取当前库存
+            Product product = productDatabase.findProductById(productId);
+            if (product != null) {
+                int availableStock = product.getNums();
+                if (requestedQuantity > availableStock) {
+                    System.out.println("商品ID " + productId + " 库存不足，调整数量为 " + availableStock + " 件。");  
+                    shoppingCart.put(entry.getKey(), availableStock);
+                }
+            }  
+            productDatabase.updateProductQuantity(productId, requestedQuantity);//进行商品数据库更新，若超出库存则删除商品
         }
 
         // 保存购买记录
@@ -137,24 +145,29 @@ public class CustomerShoppingCart {
         System.out.println("结账成功，购物车已清空！");
     }
 
-     // 查看购物历史
-     public void getPurchaseHistory() {
+    public void getPurchaseHistory()  {
         if (purchaseHistoryList.isEmpty()) {
             System.out.println("暂无购物历史。");
             return;
         }
         System.out.println("您的购物历史：");
-
         for (Map<String, Integer> history : purchaseHistoryList) {
             // 获取当前北京时间
             ZonedDateTime beijingTime = ZonedDateTime.now(ZoneId.of("Asia/Shanghai"));
-
+    
             // 使用包含日期和时间的 ZonedDateTime 对象
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = beijingTime.format(formatter);
-
+    
             System.out.println("购物时间: " + formattedDateTime);
-            System.out.println("商品清单: " + history);
+            System.out.println("商品清单:");
+    
+            for (Map.Entry<String, Integer> entry : history.entrySet()) {
+                String productId = entry.getKey();
+                int quantity = entry.getValue();
+    
+                System.out.println("商品ID: " + productId + ", 数量: " + quantity);
+            }
         }
     }
 }
