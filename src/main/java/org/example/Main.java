@@ -13,26 +13,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("欢迎使用购物管理系统");
 
-// //   文件路径
-//         String CUSTOMER_FILE = "customers.txt";
-
-//         // 创建一个空的用户列表
-//         List<Customer> emptyCustomers = new ArrayList<>();
-
-//         // 将空的用户列表写入文件
-//         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CUSTOMER_FILE))) {
-//             oos.writeObject(emptyCustomers);
-//             System.out.println("customers.dat 文件中的所有数据已删除。");
-//         } catch (IOException e) {
-//             System.err.println("Error deleting customers from file: " + e.getMessage());
-//         }
-
-
-
         // 初始化数据库和用户
         Administrator admin=new Administrator();
-        
-
         admin.insertDefaultAdmin();
         
         CustomerRegister customerRegister=new CustomerRegister();
