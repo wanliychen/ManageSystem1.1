@@ -52,7 +52,7 @@ public class CustomerShoppingCart {
             return;
         }
 
-        System.out.println("确认要移除商品ID " + productId + " 吗？(yes/no)");
+        System.out.println("确认要移除商品ID " + productId + " 吗？(y/n)");
         String confirmation = scanner.nextLine();
         
         if (confirmation.equalsIgnoreCase("yes")) {
