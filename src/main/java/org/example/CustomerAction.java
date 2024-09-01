@@ -3,9 +3,9 @@ package org.example;
 
 import java.util.Scanner;
 
-public class CustomerAction {
+public class CustomerAction implements Actionable {
     
-
+    @Override
     public void run() {
         Scanner scanner=new Scanner(System.in);
         
@@ -32,7 +32,8 @@ public class CustomerAction {
         }
     }
 
-    private void displayMenu() {
+    @Override
+    public void displayMenu() {
         System.out.println("请选择操作：");
         System.out.println("1. 购物管理");
         System.out.println("2. 修改密码");

@@ -3,7 +3,7 @@ package org.example;
 import java.util.List;
 import java.util.Scanner;
 
-public class RunProduct {
+public class RunProduct implements Actionable {
     private Scanner scanner;
     private ProductDatabase productDatabase;
 
@@ -12,10 +12,10 @@ public class RunProduct {
         this.productDatabase = new ProductDatabase();
     }
 
+    @Override
     public void run() {
         while (true) {
             displayMenu();
-            
             int choice = scanner.nextInt();
             scanner.nextLine(); // 消耗换行符
 
@@ -44,7 +44,8 @@ public class RunProduct {
         }
     }
 
-    private void displayMenu() {
+    @Override
+    public void displayMenu() {
         System.out.println("请选择操作：");
         System.out.println("1. 增加商品");
         System.out.println("2. 删除商品");
@@ -138,5 +139,4 @@ public class RunProduct {
             System.out.println(product);
         }
     }
-
 }
