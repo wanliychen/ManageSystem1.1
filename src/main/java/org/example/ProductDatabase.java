@@ -3,6 +3,7 @@ package org.example;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ProductDatabase {
     private static final String PRODUCT_FILE = "products.txt";
@@ -59,6 +60,15 @@ public class ProductDatabase {
 
     // 删除商品
     public static void deleteProduct(int productId) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("您确定要删除商品 " +productId + " 吗？该操作不可撤销。 (y/n)");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (!confirmation.equals("y")) {
+            System.out.println("删除操作已取消。");
+            return; // 取消删除操作
+        }
+
         List<Product> products = loadProductsFromFile();
         boolean removed = products.removeIf(p -> p.getProductId() == productId);
         saveProductsToFile(products);
