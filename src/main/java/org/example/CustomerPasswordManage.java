@@ -50,7 +50,8 @@ public class CustomerPasswordManage {
     private boolean updatePassword(String username, String oldPassword, String newPassword) {
         Customer customer = customerDatabase.findCustomerByUsername(username);
         if (customer != null && verifyPassword(oldPassword, customer.getPassword())) {
-            customer.setPassword(newPassword);
+            String hashedPassword=hashPassword(newPassword);
+            customer.setPassword(hashedPassword);
             customerDatabase.updateCustomer(username, customer);
             return true;
         }

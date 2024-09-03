@@ -16,6 +16,7 @@ public class CustomerDatabase {
     public static List<Customer> loadCustomersFromFile() {
         List<Customer> customers = new ArrayList<>();
         File file = new File(CUSTOMER_FILE);
+        
         if (file.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(CUSTOMER_FILE))) {
                 String line;
@@ -34,6 +35,11 @@ public class CustomerDatabase {
     }
 
     public static void saveCustomersToFile(List<Customer> customers) {
+        if (customers == null || customers.isEmpty()) {
+            System.out.println("客户列表为空，无法保存！");
+            return;
+        }
+        
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(CUSTOMER_FILE))) {
             for (Customer customer : customers) {
                 writer.write(customer.getUsername() + ";" + customer.getPassword() + ";" + customer.getEmail() + ";" +

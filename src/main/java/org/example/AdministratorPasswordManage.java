@@ -83,7 +83,7 @@ public class AdministratorPasswordManage {
             System.out.println(e.getMessage());
         }
 
-        // Delete old file and rename temp file
+        
         inputFile.delete();
         tempFile.renameTo(inputFile);
     }
@@ -104,17 +104,59 @@ public class AdministratorPasswordManage {
         }
     }
 
-    private String generateRandomPassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-        StringBuilder password = new StringBuilder();
-        Random rnd = new Random();
-        while (password.length() < 8) {
-            int index = (int) (rnd.nextFloat() * chars.length());
-            password.append(chars.charAt(index));
-        }
-        return password.toString();
-    }
+    // private String generateRandomPassword() {
+    //     String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    //     StringBuilder password = new StringBuilder();
+    //     Random rnd = new Random();
+    //     while (password.length() < 8) {
+    //         int index = (int) (rnd.nextFloat() * chars.length());
+    //         password.append(chars.charAt(index));
+    //     }
+    //     return password.toString();
+    // }
 
+
+     // 生成随机密码
+    private String generateRandomPassword() {
+        String LOWERCASE_CHARS = "abcdefghijklmnopqrstuvwxyz";
+        String UPPERCASE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String DIGITS = "0123456789";
+        String SPECIAL_CHARS = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        
+    
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+
+        // 确保密码中包含至少一个小写字母
+        password.append(LOWERCASE_CHARS.charAt(random.nextInt(LOWERCASE_CHARS.length())));
+
+        // 确保密码中包含至少一个大写字母
+        password.append(UPPERCASE_CHARS.charAt(random.nextInt(UPPERCASE_CHARS.length())));
+
+        // 确保密码中包含至少一个数字
+        password.append(DIGITS.charAt(random.nextInt(DIGITS.length())));
+
+        // 确保密码中包含至少一个特殊字符
+        password.append(SPECIAL_CHARS.charAt(random.nextInt(SPECIAL_CHARS.length())));
+
+        // 填充剩余的密码长度
+        for (int i = 4; i < 10; i++) {
+            String allChars = LOWERCASE_CHARS + UPPERCASE_CHARS + DIGITS + SPECIAL_CHARS;
+            password.append(allChars.charAt(random.nextInt(allChars.length())));
+        }
+
+        // 将密码字符随机打乱
+        char[] passwordArray = password.toString().toCharArray();
+        for (int i = 0; i < passwordArray.length; i++) {
+            int randomIndex = random.nextInt(passwordArray.length);
+            char temp = passwordArray[i];
+            passwordArray[i] = passwordArray[randomIndex];
+            passwordArray[randomIndex] = temp;
+        }
+
+        return new String(passwordArray);
+    }
+    
     private static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

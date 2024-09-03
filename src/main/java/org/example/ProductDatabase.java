@@ -14,6 +14,11 @@ public class ProductDatabase {
     }
     // 保存商品列表到文件（退出时调用）
     public static void saveProductsToFile(List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            System.out.println("产品列表为空，无法保存！");
+            return;
+        }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
             for (Product product : products) {
                 writer.write(product.getProductId() + ";" + product.getProductName() + ";" + product.getManufacturer() + ";" +
@@ -124,8 +129,5 @@ public class ProductDatabase {
             System.out.println("未找到对应商品，商品ID: " + productId);
         }
     }
-    // public List<Product> getProducts() {
-        
-    //     throw new UnsupportedOperationException("Unimplemented method 'getProducts'");
-    // }
+   
 }
