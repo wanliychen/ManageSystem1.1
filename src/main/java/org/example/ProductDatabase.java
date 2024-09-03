@@ -24,10 +24,12 @@ public class ProductDatabase {
                 writer.write(product.getProductId() + ";" + product.getProductName() + ";" + product.getManufacturer() + ";" +
                         product.getModel() + ";" + product.getPurchasePrice() + ";" + product.getRetailPrice() + ";" + product.getNums());
                 writer.newLine();
-            }
+            } 
+            System.out.println("产品数据已成功保存到文件: " + PRODUCT_FILE);
         } catch (IOException e) {
             System.err.println("保存商品到文件时出错: " + e.getMessage());
         }
+        
     }
 
     // 从文件加载商品列表（启动时调用）

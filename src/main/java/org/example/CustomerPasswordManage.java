@@ -73,8 +73,7 @@ public class CustomerPasswordManage {
             } else {
                 System.out.println("用户不存在！");
             }
-            // updatePassword(username, oldPassword, hashedPassword);
-            // sendPasswordToEmail(email, newPassword);
+            
             System.out.println("新密码已发送到您的邮箱，请查收！");
         } else {
             System.out.println("用户名或邮箱不正确，密码重置失败！");
@@ -85,22 +84,41 @@ public class CustomerPasswordManage {
         Customer customer = customerDatabase.findCustomerByUsername(username);
         return customer != null && customer.getEmail().equals(email);
     }
-
+    
+    // 生成随机密码
     private String generateRandomPassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        String LOWERCASE_CHARS = "abcdefghijklmnopqrstuvwxyz";
+        String UPPERCASE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String DIGITS = "0123456789";
+        String SPECIAL_CHARS = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        
+        Random random = new Random();
         StringBuilder password = new StringBuilder();
-        Random rnd = new Random();
-        while (password.length() < 8) {
-            int index = (int) (rnd.nextFloat() * chars.length());
-            password.append(chars.charAt(index));
+        // 确保密码中包含至少一个小写字母
+        password.append(LOWERCASE_CHARS.charAt(random.nextInt(LOWERCASE_CHARS.length())));
+        // 确保密码中包含至少一个大写字母
+        password.append(UPPERCASE_CHARS.charAt(random.nextInt(UPPERCASE_CHARS.length())));
+        // 确保密码中包含至少一个数字
+        password.append(DIGITS.charAt(random.nextInt(DIGITS.length())));
+        // 确保密码中包含至少一个特殊字符
+        password.append(SPECIAL_CHARS.charAt(random.nextInt(SPECIAL_CHARS.length())));
+        // 填充剩余的密码长度
+        for (int i = 4; i < 10; i++) {
+            String allChars = LOWERCASE_CHARS + UPPERCASE_CHARS + DIGITS + SPECIAL_CHARS;
+            password.append(allChars.charAt(random.nextInt(allChars.length())));
         }
-        return password.toString();
+        // 将密码字符随机打乱
+        char[] passwordArray = password.toString().toCharArray();
+        for (int i = 0; i < passwordArray.length; i++) {
+            int randomIndex = random.nextInt(passwordArray.length);
+            char temp = passwordArray[i];
+            passwordArray[i] = passwordArray[randomIndex];
+            passwordArray[randomIndex] = temp;
+        }
+
+        return new String(passwordArray);
     }
 
-    private void sendPasswordToEmail(String email, String password) {
-        // 模拟发送邮件功能
-        System.out.println("模拟发送邮件到 " + email + "，新密码为：" + password);
-    }
 
     private static String hashPassword(String password) {
         try {

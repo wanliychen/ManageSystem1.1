@@ -30,3 +30,7 @@ admin:@cc1234YNU
 admin:@cc1234YNU
 admin:@cc1234YNU
 admin:@cc1234YNU
+admin:ynuinfo#777
+admin:ynuinfo#777
+admin:ynuinfo#777
+admin:ynuinfo#777

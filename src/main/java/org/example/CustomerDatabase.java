@@ -39,13 +39,14 @@ public class CustomerDatabase {
             System.out.println("客户列表为空，无法保存！");
             return;
         }
-        
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(CUSTOMER_FILE))) {
             for (Customer customer : customers) {
                 writer.write(customer.getUsername() + ";" + customer.getPassword() + ";" + customer.getEmail() + ";" +
                         customer.getPhone() + ";" + customer.getRegistrationDate() + ";" + customer.getUserLevel());
                 writer.newLine();
             }
+            System.out.println("客户数据已成功保存到文件: " + CUSTOMER_FILE);
         } catch (IOException e) {
             System.err.println("保存用户到文件时出错: " + e.getMessage());
         }
