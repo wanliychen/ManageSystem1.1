@@ -1,19 +1,22 @@
 package org.example;
 
 import java.util.*;
-import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class CustomerLogin {
-    // 文件路径
-    private static final String CUSTOMER_FILE = "customers.txt";
-
     private Scanner scanner = new Scanner(System.in);
     private Map<String, Integer> loginAttemptsMap = new HashMap<>();
-    private CustomerPasswordManage cpm = new CustomerPasswordManage();
-    private CustomerDatabase customerDatabase = new CustomerDatabase();
+    private CustomerPasswordManage cpm;
+    private CustomerDatabase customerDatabase;
+    private ProductDatabase productDatabase;
 
+    public CustomerLogin(CustomerDatabase customerDatabase, ProductDatabase productDatabase) {
+        this.customerDatabase = customerDatabase;
+        this.productDatabase = productDatabase;
+        this.cpm = new CustomerPasswordManage(customerDatabase);
+    }
+    
     public void run() {
         while (true) {
             System.out.println("请输入用户名：");
@@ -23,7 +26,7 @@ public class CustomerLogin {
 
             if (loginCustomer(username, password)) {
                 System.out.println("登录成功！");
-                CustomerAction customerAction = new CustomerAction();
+                CustomerAction customerAction = new CustomerAction(customerDatabase, productDatabase);
                 customerAction.run();
                 break;
             } else {
@@ -62,12 +65,11 @@ public class CustomerLogin {
         return false;
     }
 
-     // 验证密码
     private static boolean verifyPassword(String inputPassword, String storedHash) {
         String hashedInput = hashPassword(inputPassword);
         return hashedInput.equals(storedHash);
     }
-    // 使用MD5加密
+
     private static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

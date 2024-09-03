@@ -1,10 +1,5 @@
 package org.example;
 
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -13,12 +8,19 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("欢迎使用购物管理系统");
 
-        // 初始化数据库和用户
-        Administrator admin=new Administrator();
+        // 程序开始时读取文件
+        List<Product> products = ProductDatabase.loadProductsFromFile();
+        List<Customer> customers = CustomerDatabase.loadCustomersFromFile();
+
+        CustomerDatabase customerDatabase = new CustomerDatabase(customers);  // 创建CustomerDatabase实例
+        ProductDatabase productDatabase = new ProductDatabase(products);     // 创建ProductDatabase实例
+
+        Administrator admin = new Administrator();
         admin.insertDefaultAdmin();
-        
-        CustomerRegister customerRegister=new CustomerRegister();
-        CustomerLogin customerLogin=new CustomerLogin();
+
+        CustomerRegister customerRegister = new CustomerRegister(customers);
+        CustomerLogin customerLogin = new CustomerLogin(customerDatabase, productDatabase);
+
         Scanner scanner = new Scanner(System.in);
 
         try {
@@ -29,7 +31,7 @@ public class Main {
 
                 switch (choice) {
                     case 1:
-                        handleAdminLogin(scanner, admin);
+                        handleAdminLogin(scanner, admin, customerDatabase, productDatabase);
                         break;
                     case 2:
                         customerRegister.run();
@@ -39,7 +41,10 @@ public class Main {
                         break;
                     case 4:
                         System.out.println("退出系统");
-                        return; // 退出主循环
+                        // 在程序退出时保存文件
+                        ProductDatabase.saveProductsToFile(products);
+                        CustomerDatabase.saveCustomersToFile(customers);
+                        return;
                     default:
                         System.out.println("无效的选择，请重新输入！");
                 }
@@ -69,15 +74,13 @@ public class Main {
         }
     }
 
-    private static void handleAdminLogin(Scanner scanner, Administrator admin) {
+    private static void handleAdminLogin(Scanner scanner, Administrator admin, CustomerDatabase customerDatabase, ProductDatabase productDatabase) {
         if (admin.loginAdmin(scanner)) {
             System.out.println("管理员登录成功！");
-            AdministratorAction adminAction = new AdministratorAction();
+            AdministratorAction adminAction = new AdministratorAction(customerDatabase.getAllCustomers(), productDatabase.getAllProducts());
             adminAction.run();
         } else {
             System.out.println("管理员登录失败！");
         }
     }
-
-    
-} 
+}

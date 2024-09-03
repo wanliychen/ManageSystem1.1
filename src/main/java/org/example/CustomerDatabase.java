@@ -7,22 +7,13 @@ import java.util.Scanner;
 
 public class CustomerDatabase {
     private static final String CUSTOMER_FILE = "customers.txt";
+    public List<Customer> customerList;
 
-    // 保存用户列表到文件
-    public void saveCustomersToFile(List<Customer> customers) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(CUSTOMER_FILE))) {
-            for (Customer customer : customers) {
-                writer.write(customer.getUsername() + ";" + customer.getPassword() + ";" + customer.getEmail() + ";" +
-                        customer.getPhone() + ";" + customer.getRegistrationDate() + ";" + customer.getUserLevel());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error saving customers to file: " + e.getMessage());
-        }
+    public CustomerDatabase(List<Customer> customerList) {
+        this.customerList = customerList;
     }
 
-    // 从文件加载用户列表
-    public List<Customer> loadCustomersFromFile() {
+    public static List<Customer> loadCustomersFromFile() {
         List<Customer> customers = new ArrayList<>();
         File file = new File(CUSTOMER_FILE);
         if (file.exists()) {
@@ -36,58 +27,69 @@ public class CustomerDatabase {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Error loading customers from file: " + e.getMessage());
+                System.err.println("加载用户文件时出错: " + e.getMessage());
             }
         }
         return customers;
     }
 
-    // 添加用户
-    public void addCustomer(Customer customer) {
-        List<Customer> customers = loadCustomersFromFile();
-        customers.add(customer);
-        saveCustomersToFile(customers);
+    public static void saveCustomersToFile(List<Customer> customers) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(CUSTOMER_FILE))) {
+            for (Customer customer : customers) {
+                writer.write(customer.getUsername() + ";" + customer.getPassword() + ";" + customer.getEmail() + ";" +
+                        customer.getPhone() + ";" + customer.getRegistrationDate() + ";" + customer.getUserLevel());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("保存用户到文件时出错: " + e.getMessage());
+        }
     }
 
-    // 删除用户
+    public void addCustomer(Customer customer) {
+        customerList.add(customer);
+        System.out.println("用户已成功添加: " + customer.getUsername());
+    }
+
     public void deleteCustomerByUsername(String username) {
-         Scanner scanner = new Scanner(System.in);
-        System.out.println("您确定要删除商品 " +username + " 吗？该操作不可撤销。 (y/n)");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("您确定要删除用户 " + username + " 吗？该操作不可撤销。 (y/n)");
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
         if (!confirmation.equals("y")) {
             System.out.println("删除操作已取消。");
-            return; // 取消删除操作
+            return;
         }
 
-        List<Customer> customers = loadCustomersFromFile();
-        customers.removeIf(c -> c.getUsername().equals(username));
-        saveCustomersToFile(customers);
+        boolean removed = customerList.removeIf(p -> p.getUsername().equals(username));
+        if (removed) {
+            System.out.println("用户已成功删除，用户名: " + username);
+        } else {
+            System.out.println("未找到对应用户，用户名: " + username);
+        }
     }
 
-    // 查找用户（通过用户名）
     public Customer findCustomerByUsername(String username) {
-        List<Customer> customers = loadCustomersFromFile();
-        return customers.stream()
-                .filter(c -> c.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
+        for (Customer customer : customerList) {
+            if (customer.getUsername().equals(username)) {
+                System.out.println("找到用户，用户名: " + username);
+                return customer;
+            }
+        }
+        System.out.println("未找到对应用户，用户名: " + username);
+        return null;
     }
 
-    // 更新用户
     public void updateCustomer(String username, Customer updatedCustomer) {
-        List<Customer> customers = loadCustomersFromFile();
-        for (int i = 0; i < customers.size(); i++) {
-            if (customers.get(i).getUsername().equals(username)) {
-                customers.set(i, updatedCustomer);
+        for (int i = 0; i < customerList.size(); i++) {
+            if (customerList.get(i).getUsername().equals(username)) {
+                customerList.set(i, updatedCustomer);
+                System.out.println("用户已成功更新，用户名: " + username);
                 break;
             }
         }
-        saveCustomersToFile(customers);
     }
 
-    // 获取所有用户
     public List<Customer> getAllCustomers() {
-        return loadCustomersFromFile();
+        return customerList;
     }
 }

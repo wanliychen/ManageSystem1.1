@@ -7,9 +7,13 @@ import java.util.Scanner;
 
 public class ProductDatabase {
     private static final String PRODUCT_FILE = "products.txt";
-
-    // 保存商品列表到文件
-    private static void saveProductsToFile(List<Product> products) {
+    private static List<Product> productList;
+   
+    public ProductDatabase(List<Product> productList){
+        this.productList=productList;
+    }
+    // 保存商品列表到文件（退出时调用）
+    public static void saveProductsToFile(List<Product> products) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
             for (Product product : products) {
                 writer.write(product.getProductId() + ";" + product.getProductName() + ";" + product.getManufacturer() + ";" +
@@ -21,8 +25,8 @@ public class ProductDatabase {
         }
     }
 
-    // 从文件加载商品列表
-    private static List<Product> loadProductsFromFile() {
+    // 从文件加载商品列表（启动时调用）
+    public static List<Product> loadProductsFromFile() {
         List<Product> products = new ArrayList<>();
         File file = new File(PRODUCT_FILE);
         if (file.exists()) {
@@ -50,11 +54,10 @@ public class ProductDatabase {
         return products;
     }
 
+
     // 增加商品
     public static void addProduct(Product product) {
-        List<Product> products = loadProductsFromFile();
-        products.add(product);
-        saveProductsToFile(products);
+        productList.add(product);
         System.out.println("商品已成功添加: " + product.getProductName());
     }
 
@@ -69,9 +72,7 @@ public class ProductDatabase {
             return; // 取消删除操作
         }
 
-        List<Product> products = loadProductsFromFile();
-        boolean removed = products.removeIf(p -> p.getProductId() == productId);
-        saveProductsToFile(products);
+        boolean removed = productList.removeIf(p -> p.getProductId() == productId);
         if (removed) {
             System.out.println("商品已成功删除，商品ID: " + productId);
         } else {
@@ -81,11 +82,7 @@ public class ProductDatabase {
 
     // 查找商品（通过ID）
     public static Product findProductById(int productId) {
-        List<Product> products = loadProductsFromFile();
-        Product product = products.stream()
-                .filter(p -> p.getProductId() == productId)
-                .findFirst()
-                .orElse(null);
+        Product product=productList.stream().filter(p -> p.getProductId() == productId).findFirst().orElse(null);
         if (product != null) {
             System.out.println("找到商品，商品ID: " + productId + "，商品名称: " + product.getProductName());
         } else {
@@ -96,21 +93,18 @@ public class ProductDatabase {
 
     // 更新商品
     public static void updateProduct(int productId, Product updatedProduct) {
-        List<Product> products = loadProductsFromFile();
-        for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getProductId() == productId) {
-                products.set(i, updatedProduct);
+        for (int i = 0; i < productList.size(); i++) {
+            if (productList.get(i).getProductId() == productId) {
+                productList.set(i, updatedProduct);
+                System.out.println("商品已成功更新，商品ID: " + productId);
                 break;
             }
         }
-        saveProductsToFile(products);
-        System.out.println("商品已成功更新，商品ID: " + productId);
     }
 
     // 获取所有商品
     public static List<Product> getAllProducts() {
-        System.out.println("正在加载所有商品...");
-        return loadProductsFromFile();
+       return productList;
     }
 
     // 更新商品库存数量
@@ -125,10 +119,13 @@ public class ProductDatabase {
             } else if (newQuantity <= 0) {
                 // 删除商品，如果数量小于或等于0
                 deleteProduct(productId);
-               
             }
         } else {
             System.out.println("未找到对应商品，商品ID: " + productId);
         }
     }
+    // public List<Product> getProducts() {
+        
+    //     throw new UnsupportedOperationException("Unimplemented method 'getProducts'");
+    // }
 }

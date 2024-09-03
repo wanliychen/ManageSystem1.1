@@ -1,23 +1,28 @@
 package org.example;
 
-import java.util.*;
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+import java.util.Scanner;
 
 public class AdministratorPasswordManage {
     private static final String ADMIN_FILE = "admins.txt";
     private static final String CUSTOMER_FILE = "customers.txt";
 
-    CustomerDatabase customerDatabase = new CustomerDatabase();
+    private CustomerDatabase customerDatabase; 
     
     private Scanner scanner = new Scanner(System.in);
+
+    public AdministratorPasswordManage(CustomerDatabase customerDatabase) {
+        this.customerDatabase = customerDatabase;
+    }
 
     public void run() {
         while (true) {
             displayMenu();
             int choice = scanner.nextInt();
-            scanner.nextLine(); // 消耗换行符
+            scanner.nextLine(); // Consume newline
 
             switch (choice) {
                 case 1:
@@ -78,13 +83,11 @@ public class AdministratorPasswordManage {
             System.out.println(e.getMessage());
         }
 
-        // 删除旧文件，重命名临时文件
+        // Delete old file and rename temp file
         inputFile.delete();
         tempFile.renameTo(inputFile);
     }
 
-    
-    // 重置特定用户的密码
     public void resetCustomerPassword() {
         System.out.println("输入用户名：");
         String username = scanner.nextLine();
@@ -125,7 +128,4 @@ public class AdministratorPasswordManage {
             throw new RuntimeException("MD5 algorithm not found", e);
         }
     }
-
 }
-    
-

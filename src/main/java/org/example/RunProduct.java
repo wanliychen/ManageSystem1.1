@@ -7,9 +7,9 @@ public class RunProduct implements Actionable {
     private Scanner scanner;
     private ProductDatabase productDatabase;
 
-    public RunProduct() {
+    public RunProduct(List<Product> products) {
         this.scanner = new Scanner(System.in);
-        this.productDatabase = new ProductDatabase();
+        this.productDatabase = new ProductDatabase(products);  // 使用实际的顾客列表初始化
     }
 
     @Override

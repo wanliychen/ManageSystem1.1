@@ -9,10 +9,11 @@ public class RunCustomer implements Actionable {
     private Scanner scanner;
     private CustomerDatabase customerDatabase;
 
-    public RunCustomer() {
+    public RunCustomer(List<Customer> customers) {
         this.scanner = new Scanner(System.in);
-        this.customerDatabase = new CustomerDatabase();
+        this.customerDatabase = new CustomerDatabase(customers);  // 使用实际的顾客列表初始化
     }
+
 
     @Override
     public void run() {

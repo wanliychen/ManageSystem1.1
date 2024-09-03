@@ -6,12 +6,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class CustomerPasswordManage {
-    // 文件路径
-    private static final String CUSTOMER_FILE = "customers.txt";
-
     private Scanner scanner = new Scanner(System.in);
-    private CustomerDatabase customerDatabase = new CustomerDatabase();
+    private CustomerDatabase customerDatabase;
 
+    public CustomerPasswordManage(CustomerDatabase customerDatabase) {
+        this.customerDatabase = customerDatabase;
+    }
+    
+    
     public void changePassword() {
         System.out.println("输入用户名：");
         String username = scanner.nextLine();
