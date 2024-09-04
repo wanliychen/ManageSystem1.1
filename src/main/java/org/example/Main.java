@@ -12,8 +12,8 @@ public class Main {
         List<Product> products = ProductDatabase.loadProductsFromFile();
         List<Customer> customers = CustomerDatabase.loadCustomersFromFile();
 
-        CustomerDatabase customerDatabase = new CustomerDatabase(customers);  // 创建CustomerDatabase实例
-        ProductDatabase productDatabase = new ProductDatabase(products);     // 创建ProductDatabase实例
+        CustomerDatabase customerDatabase = new CustomerDatabase(customers);  
+        ProductDatabase productDatabase = new ProductDatabase(products);     
 
         Administrator admin = new Administrator();
         admin.insertDefaultAdmin();
